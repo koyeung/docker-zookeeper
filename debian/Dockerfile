@@ -41,7 +41,9 @@ RUN mkdir -p share/zookeeper /tmp/zookeeper && \
     chown -R zookeeper:hadoop conf/zoo.cfg conf/zoo.cfg.dynamic
 
 EXPOSE 2181 2888 3888 8080
+VOLUME ["${INSTALLDIR}/conf" /tmp/zookeeper]
 
-VOLUME ["${INSTALLDIR}/conf"]
+ADD setup.sh bin
+RUN chown -R zookeeper.hadoop bin/setup.sh
 
 USER zookeeper

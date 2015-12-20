@@ -3,39 +3,38 @@ Run [ZooKeeper](https://zookeeper.apache.org) 3.5.x in Distributed mode
 
 
 ## Usage
+
 1. Start containers
    ``` bash
-   docker run -d -t --name zk1 zookeeper
-   docker run -d -t --name zk2 --volumes-from zk1 zookeeper
-   docker run -d -t --name zk3 --volumes-from zk1 zookeeper
-
-   docker exec zk1 bin/zkServer-initialize.sh --myid=1
-   docker exec zk2 bin/zkServer-initialize.sh --myid=2
-   docker exec zk3 bin/zkServer-initialize.sh --myid=3
+   SERVERS=3
+   for i in $(seq $SERVERS); do
+       docker run -d -t --name zk${i} zookeeper
+       docker exec zk${i} bin/setup.sh --myid=${i}
+   done
    ```
 
-1. Create initial dynamic configuration
-
+1. Consolidate server list
    ``` bash
-   containers="zk1 zk2 zk3"
-   ports=2888:3888
-   i=1
-   for h in $containers; do
-     ip=$( docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${h} )
-     echo "server.${i}=${ip}:${ports}"
-     i=$(( i+1 ))
-   done > zoo.cfg.dynamic
+   SERVER=3
+   echo -n "" > /tmp/zoo.cfg.dynamic
+   for i in $(seq $SERVERS); do
+       docker exec zk${i} cat /opt/zookeeper/conf/zoo.cfg.dynamic >> /tmp/zoo.cfg.dynamic
+   done
    ```
 
-1. Transfer dynamic configuration to container:
+1. Transfer full server list to containers
    ``` bash
-   docker cp zoo.cfg.dynamic zk1:/opt/zookeeper/conf/zoo.cfg.input.dynamic
-   docker exec zk1 cp /opt/zookeeper/conf/zoo.cfg.input.dynamic /opt/zookeeper/conf/zoo.cfg.dynamic
+   SERVER=3
+   for i in $(seq $SERVERS); do
+       docker cp /tmp/zoo.cfg.dynamic zk${i}:/opt/zookeeper/conf/zoo.cfg.input.dynamic
+       docker exec zk${i} cp /opt/zookeeper/conf/zoo.cfg.input.dynamic /opt/zookeeper/conf/zoo.cfg.dynamic
+   done
    ```
 
-1. Start the servers
+1. Start the server processes
    ``` bash
-   docker exec zk1 bin/zkServer.sh start
-   docker exec zk2 bin/zkServer.sh start
-   docker exec zk3 bin/zkServer.sh start
+   SERVER=3
+   for i in $(seq $SERVERS); do
+       docker exec zk${i} bin/zkServer.sh start
+   done
    ```
