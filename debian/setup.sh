@@ -26,7 +26,12 @@ setup() {
 
     if [ $MYID ]; then
         ./bin/zkServer-initialize.sh --myid=${MYID}
-        echo "server.${MYID}=$(hostname --ip-address):2888:3888" > /opt/zookeeper/conf/zoo.cfg.dynamic
+
+        CONFDIR=/opt/zookeeper/conf
+        
+        echo "server.${MYID}=$(hostname --ip-address):2888:3888" > ${CONFDIR}/zoo.cfg.dynamic
+        echo "standaloneEnabled=false" >> ${CONFDIR}/zoo.cfg
+        echo "dynamicConfigFile=${CONFDIR}/zoo.cfg.dynamic" >> ${CONFDIR}/zoo.cfg
     else
         echo "No myid provided; no setup is done"
     fi

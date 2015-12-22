@@ -28,7 +28,6 @@ RUN getent group hadoop 2>/dev/null >/dev/null || /usr/sbin/groupadd -r hadoop &
 
 # inst
 RUN mkdir -p share/zookeeper /tmp/zookeeper && \
-    chown -R zookeeper:hadoop . /tmp/zookeeper && \
     cp -r src/packages/templates share/zookeeper && \
     cp -f conf/zoo_sample.cfg share/zookeeper/templates/conf/zoo.cfg && \
     ./src/packages/update-zookeeper-env.sh \
@@ -37,13 +36,10 @@ RUN mkdir -p share/zookeeper /tmp/zookeeper && \
       --log-dir=/var/log/zookeeper \
       --pid-dir=/var/run/zookeeper \
       --var-dir=/var/lib/zookeeper && \
-    echo "standaloneEnabled=false" >> conf/zoo.cfg && \
-    echo "dynamicConfigFile=/opt/zookeeper/conf/zoo.cfg.dynamic" >> conf/zoo.cfg && \
-    touch conf/zoo.cfg.dynamic && \
-    chown -R zookeeper:hadoop conf/zoo.cfg conf/zoo.cfg.dynamic
+    chown -R zookeeper:hadoop . /tmp/zookeeper
 
 EXPOSE 2181 2888 3888 8080
-VOLUME ["${INSTALLDIR}/conf" /tmp/zookeeper]
+VOLUME ["${INSTALLDIR}/conf", /tmp/zookeeper]
 
 ADD setup.sh bin
 RUN chown -R zookeeper.hadoop bin/setup.sh
