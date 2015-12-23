@@ -41,7 +41,7 @@ RUN mkdir -p share/zookeeper /tmp/zookeeper && \
 EXPOSE 2181 2888 3888 8080
 VOLUME ["${INSTALLDIR}/conf", /tmp/zookeeper]
 
-COPY ["setup.sh", "bin"]
+COPY ["setup.sh", "bin/"]
 RUN chown zookeeper:hadoop bin/setup.sh
 
 USER zookeeper
