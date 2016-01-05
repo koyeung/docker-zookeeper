@@ -1,6 +1,6 @@
 # [Apache ZooKeeper](https://zookeeper.apache.org/)
 
-FROM debian:latest
+FROM debian:jessie
 
 MAINTAINER King-On Yeung <koyeung@gmail.com>
 
