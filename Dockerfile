@@ -1,6 +1,6 @@
 # [Apache ZooKeeper](https://zookeeper.apache.org/)
 
-FROM centos:latest
+FROM centos:7
 
 MAINTAINER King-On Yeung <koyeung@gmail.com>
 
@@ -9,7 +9,6 @@ ENV INSTALLDIR /opt/zookeeper
 ENV JAVA_HOME /usr/lib/jvm/jre
 
 RUN yum install -y deltarpm yum-utils && \
-    yum update -y && \
     yum install -y java-1.8.0-openjdk-headless wget && \
     yum clean all
 
